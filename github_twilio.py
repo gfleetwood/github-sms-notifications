@@ -24,3 +24,5 @@ def send_notification(notification):
     return(True)
 
 _ = [send_notification(notification) for notification in noti]
+
+if len(noti) == 0: send_notification("No notifications")
