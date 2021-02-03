@@ -2,14 +2,6 @@ from github import Github
 import os
 from twilio.rest import Client
 
-account_sid = os.environ.get("TWILIOSID")
-auth_token = os.environ.get("TWILIOTOKEN")
-g = Github(os.environ["GHUB"])
-
-client = Client(account_sid, auth_token)
-usr = g.get_user()
-noti = [(a.repository.full_name, a.subject.title) for a in usr.get_notifications()]
-
 def send_notification(notification):
     
     message = client.messages \
@@ -19,10 +11,13 @@ def send_notification(notification):
         to = os.environ["MYPHONE"]
     )
     
-    print(message.sid)
-    
     return(True)
 
-_ = [send_notification(notification) for notification in noti]
+account_sid = os.environ.get("TWILIOSID")
+auth_token = os.environ.get("TWILIOTOKEN")
+g = Github(os.environ["GHUB"])
+client = Client(account_sid, auth_token)
+usr = g.get_user()
 
-if len(noti) == 0: send_notification("No notifications")
+noti = [(a.repository.full_name, a.subject.title) for a in usr.get_notifications()]
+_ = send_notification("No notifications") if len(noti) == 0 else [send_notification(notification) for notification in noti]
