@@ -1,4 +1,4 @@
-import os
+from os import environ
 from github import Github
 from twilio.rest import Client
 
@@ -7,20 +7,21 @@ def send_sms(notification):
     message = client.messages \
     .create(
         body = "GitHub Notification: {}".format(notification),
-        from_= os.environ["TWILIOPHONE"],
-        to = os.environ["MYPHONE"]
+        from_ = from_phone,
+        to = to_phone
     )
     
     return(True)
 
-account_sid = os.environ.get("TWILIOSID")
-auth_token = os.environ.get("TWILIOTOKEN")
-client = Client(account_sid, auth_token)
+from_phone = environ["TWILIOPHONE"]
+to_phone = environ["MYPHONE"]
+twilio_sid = environ["TWILIOSID"]
+twilio_token = environ["TWILIOTOKEN"]
+client = Client(twilio_sid, twilio_token)
 
 g = Github(os.environ["GHUB"])
 usr = g.get_user()
-
-notifications = [(a.repository.full_name, a.subject.title) for a in usr.get_notifications()]
+notifications = [(notification.repository.full_name, notification.subject.title) for notification in usr.get_notifications()]
 
 _ = send_sms("No notifications") \
     if len(notifications) == 0 \
